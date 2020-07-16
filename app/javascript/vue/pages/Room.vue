@@ -1,7 +1,15 @@
 <template>
   <div id="app">
-    <video id="other-video" width="200" autoplay playsinline></video>
-    <video id="my-video" muted="true" width="500" autoplay playsinline></video>
+    <div class="flex">
+      <video id="other-video" width="500" autoplay playsinline></video>
+      <video
+        id="my-video"
+        muted="true"
+        width="500"
+        autoplay
+        playsinline
+      ></video>
+    </div>
     <p>
       Your Peer ID: <span id="my-id">{{ state.peerId }}</span>
     </p>
@@ -24,7 +32,7 @@ export default defineComponent({
     const { result, loading } = useCurrentUserQuery()
     const email = useResult(result, null, (data) => data.currentUser.email)
 
-    //なんかyarn無理だったのでcdnにした
+    //yarn無理だったのでcdnにした
     const peer = new Peer({
       key: VUE_APP_SKYWAY_API_KEY
     })
@@ -103,25 +111,6 @@ export default defineComponent({
           console.error('mediaDevice.getUserMedia() error:', error)
           return
         })
-
-      // //オーディオデバイスの情報を取得する
-      // deviceInfos
-      //   .filter((deviceInfo) => deviceInfo.kind == 'audioinput')
-      //   .map((audio) =>
-      //     audios.push({
-      //       text: audio.label || `Microphone ${audios.length + 1}`,
-      //       value: audio.deviceId
-      //     })
-      //   )
-      // //ビデオデバイスの情報を取得する
-      // deviceInfos
-      //   .filter((deviceInfo) => deviceInfo.kind == 'videoinput')
-      //   .map((video) =>
-      //     videos.push({
-      //       text: video.label || `Camera ${videos.length + 1}`,
-      //       value: video.deviceId
-      //     })
-      //   )
     })
 
     // TODO: mutatioin example
