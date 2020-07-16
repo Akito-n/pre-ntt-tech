@@ -6,6 +6,7 @@ ruby '2.7.1'
 gem 'bootsnap', '>= 1.4.2', require: false
 gem 'devise-i18n'
 gem 'devise'
+gem 'dotenv'
 gem 'graphql-autotest'
 gem 'graphql-batch'
 gem 'graphql'
