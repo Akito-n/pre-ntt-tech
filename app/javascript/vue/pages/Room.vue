@@ -25,12 +25,12 @@ import { defineComponent, reactive, ref, onMounted } from '@vue/composition-api'
 import { useResult } from '@vue/apollo-composable'
 import { useCurrentUserQuery } from '@/graphql/types'
 import { UserConnection } from 'graphql/types'
-const { VUE_APP_SKYWAY_API_KEY } = process.env
 
 export default defineComponent({
   setup(_, context) {
     const { result, loading } = useCurrentUserQuery()
     const email = useResult(result, null, (data) => data.currentUser.email)
+    const { VUE_APP_SKYWAY_API_KEY } = process.env
 
     //yarn無理だったのでcdnにした
     const peer = new Peer({
