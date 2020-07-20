@@ -16,6 +16,16 @@
     <input v-model="state.calltoid" placeholder="call id" />
     <button @click="makeCall" class="button--green">Call</button>
     <br />
+    <div v-for="(emoji, i) in emojis" :key="i">
+      <span class="mr-2" @click="insert(emoji)">{{ emoji }}</span>
+    </div>
+    <div>
+      <input v-model="state.msgText" placeholder="ここにメッセージ" />
+      <button v-if="state.messageChannel" @click="speak">送信</button>
+      <p v-for="(message, index) in state.messages" :key="index">
+        {{ message.message || 'メッセージなし' }}
+      </p>
+    </div>
   </div>
 </template>
 
@@ -24,7 +34,11 @@ import Vue from 'vue'
 import { defineComponent, reactive, ref, onMounted } from '@vue/composition-api'
 import { useResult } from '@vue/apollo-composable'
 import { useCurrentUserQuery } from '@/graphql/types'
-import { UserConnection } from 'graphql/types'
+import { UserConnection, Subscription } from 'graphql/types'
+import ActionCable from 'actioncable'
+const { VUE_APP_WS } = process.env
+const cable = ActionCable.createConsumer(VUE_APP_WS)
+Vue.prototype.$cable = cable
 
 export default defineComponent({
   setup(_, context) {
@@ -42,7 +56,10 @@ export default defineComponent({
       selectedAudio: '',
       selectedVideo: '',
       peerId: '',
-      localStream: null
+      localStream: null,
+      msgText: '',
+      messages: [],
+      messageChannel: null
     })
 
     const audios = []
@@ -85,6 +102,14 @@ export default defineComponent({
     }
 
     onMounted(async () => {
+      state.messageChannel = Vue.prototype.$cable.subscriptions.create(
+        'MessageChannel',
+        {
+          received: (data) => {
+            state.messages.push(data)
+          }
+        }
+      )
       //console.log(peer)
       peer.on('open', () => (state.peerId = peer.id))
       peer.on('call', (call) => {
@@ -113,8 +138,32 @@ export default defineComponent({
         })
     })
 
+    const emojis = ['👍', '🙆', '⭐', '💡', '💯']
+
+    const speak = () => {
+      state.messageChannel.perform('speak', {
+        message: state.msgText
+      })
+      state.msgText = ''
+    }
+
+    const insert = (emoji) => {
+      state.msgText = emoji
+    }
+
     // TODO: mutatioin example
-    return { state, email, loading, audios, videos, makeCall, startCamera }
+    return {
+      state,
+      email,
+      loading,
+      audios,
+      videos,
+      makeCall,
+      startCamera,
+      speak,
+      emojis,
+      insert
+    }
   }
 })
 </script>
