@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" class="container mx-auto">
     <div class="flex">
       <video id="other-video" width="500" autoplay playsinline></video>
       <video
@@ -16,15 +16,29 @@
     <input v-model="state.calltoid" placeholder="call id" />
     <button @click="makeCall" class="button--green">Call</button>
     <br />
-    <div v-for="(emoji, i) in emojis" :key="i">
-      <span class="mr-2" @click="insert(emoji)">{{ emoji }}</span>
+    <p>絵文字</p>
+    <div class="flex">
+      <template v-for="(emoji, i) in emojis">
+        <span class="mr-2" @click="insert(emoji)" :key="i">{{ emoji }}</span>
+      </template>
     </div>
     <div>
-      <input v-model="state.msgText" placeholder="ここにメッセージ" />
+      <textarea
+        v-model="state.msgText"
+        placeholder="ここにメッセージ"
+        @keydown.enter="speakToEnter"
+        class="w-1/2 h-500px"
+      />
       <button v-if="state.messageChannel" @click="speak">送信</button>
-      <p v-for="(message, index) in state.messages" :key="index">
-        {{ message.message || 'メッセージなし' }}
-      </p>
+      <div class="border-double bg-gray-200 w-full h-40">
+        <p
+          v-for="(message, index) in state.messages"
+          :key="index"
+          class="pl-2 pt-2"
+        >
+          {{ message.message || 'メッセージなし' }}
+        </p>
+      </div>
     </div>
   </div>
 </template>
@@ -146,6 +160,13 @@ export default defineComponent({
       })
       state.msgText = ''
     }
+    const speakToEnter = (e) => {
+      if (e.keyCode == 13 && e.shiftKey === true) {
+        return
+      } else if (e.keyCode == 13) {
+        speak()
+      }
+    }
 
     const insert = (emoji) => {
       state.msgText = emoji
@@ -162,7 +183,8 @@ export default defineComponent({
       startCamera,
       speak,
       emojis,
-      insert
+      insert,
+      speakToEnter
     }
   }
 })
