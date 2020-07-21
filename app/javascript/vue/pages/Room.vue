@@ -169,7 +169,7 @@ export default defineComponent({
     }
 
     const insert = (emoji) => {
-      state.msgText = emoji
+      state.msgText = state.msgText + emoji
     }
 
     // TODO: mutatioin example
